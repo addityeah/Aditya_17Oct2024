@@ -98,24 +98,73 @@ Please refer to `requirements.txt`.
 
 ## Running the Application
 
-Start the application:
+1. Start the application:
 
-```bash
-python3 app.py
-```
+    ```bash
+    python3 app.py
+    ```
 
-To trigger the report creation, run the following command after starting the application:
+2. To trigger the report creation, run the following command after starting the application:
 
-```bash
-curl -X POST http://127.0.0.1:5000/trigger_report
-```
+    ```bash
+    curl -X POST http://127.0.0.1:5000/trigger_report
+    ```
 
-Once this completes, you will receive the `report-id` in your terminal. Use this to run the command
+3. Once this completes, you will receive the `report-id` in your terminal. Use this to run the command
 
-```bash
-curl http://127.0.0.1:5000/get_report/<report_id>
-```
+    ```bash
+    curl http://127.0.0.1:5000/get_report/<report_id>
+    ```
 
-This returns the status of the report or the CSV file if the report is complete.
+    This returns the status of the report or the CSV file if the report is complete.
 
 *P.S.: The database and MySQL credentials have been hardcoded for the purposes of this assignment. Please change it as per your requirements.*
+
+## Improving the code
+
+The following optimizations can be achieved with additional changes:
+
+1. **Eliminating the hardcoded aspects of the assignment**: This can be done by using the `os` module in python to load the variables.
+
+2. **Improving the performance of the database queries**: This can be done by indexing the tables in our database. Indexing helps our queries to avoid scanning entire tables to process every query. This will be most effective in `store_status.csv` file as it has the most entries of the three tables given.
+
+3. **Improving the thread management**: Currently, we are using the `ThreadPoolExecutor` module to enable parallel processing and faster report generation. However, we do not optimize the number of running threads. With out current implementation, we may be running more than necessary threads, which may consume extra resources. One way of doing this is:
+
+    ```bash
+    import os
+    from concurrent.futures import ThreadPoolExecutor
+
+    # Use the number of CPU cores as the default max_workers
+    MAX_WORKERS = int(os.getenv("MAX_WORKERS", os.cpu_count()))
+
+    with ThreadPoolExecutor(max_workers=min(len(stores), MAX_WORKERS)) as executor:
+    executor.map(lambda store: process_store(store[0]), stores)
+    ```
+
+4. **Improving the data loading process**: Currently, we are loading all the data into our memory. The attached image shows a snapshot of the `htop` command while the app is running in the background.
+
+    ![Screenshot](ss.png)
+
+    As evident by the screenshot, our app has a large memory footprint. The memory usage is over 12.5GB, and the swap memory is almost fully used. Thus, memory becomes a massive bottleneck.
+
+    This problem can be mitigated by ***lazy loading***, a process wherein we load only the necessary data each time, instead of loading it all at once. This is done by fetching the data in batches. A typical example would be something like this command:
+
+    ```bash
+    poll_data = PollData.query.filter_by(store_id=store_id).yield_per(1000)
+    ```
+
+While there may be some more issues that a production grade software must tackle, these are some areas of improvement I could identify.
+
+## Final words
+
+I thank **Loop** for giving me this opportunity. Special thanks to Mr. Pranayan Metiya for accomodating my needs for mid-semester exam preparation time.
+
+Before starting this assignment, I would not have imagined myself learning Python based API building web frameworks (like `Flask` and `FastAPI`) and implementing a software using them all within a week. I have become comfortable using these frameworks and with the language of Python in general.
+
+My understanding of how databases work has also improved significantly. I have learnt what database engines are, the differences between SQLite, MySQL and PostgreSQL and made (in my opinion) reasonable design choices. I have also understood that inferior performance of a database is not necessarily due to the choice of RDBMS used; in my case it was a result of poor query writing that took upwards of 1:30 hr to run my app the first time.
+
+Overall, this was a wonderful learning experience. I hope to work on such exciting projects in the future, as an intern at **Loop**! (*fingers crossed*)
+
+Fin :)
+
+---
