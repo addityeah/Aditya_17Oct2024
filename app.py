@@ -1,3 +1,10 @@
+
+'''
+Purpose of the snippet below:
+Import necessary libraries: We import the required libraries for the application, including Flask, SQLAlchemy, pandas, and pytz.
+'''
+
+
 import csv
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -8,7 +15,17 @@ import pytz
 from flask import Flask, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 
-# Initialize Flask and configure the database connection
+
+'''
+Purpose of the snippet below:
+Flask initialization: The app object is the main instance of the Flask web application.
+
+Database configuration: SQLALCHEMY_DATABASE_URI specifies the database connection string for MySQL. 
+                        SQLALCHEMY_TRACK_MODIFICATIONS is set to False to prevent unnecessary overhead 
+                        by not tracking changes to objects in the session.
+'''
+
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
@@ -122,7 +139,14 @@ def get_business_hours(store_id):
     return store_hours
 
 
-# Function to calculate uptime/downtime based on business hours and poll data
+'''
+Purpose of the snippet below:
+
+Calculates the uptime and downtime for a store based on polling data and business hours. 
+It loops through the poll data and business hours, interpolating where necessary to calculate the uptime and 
+downtime for the last hour, day, and week.
+
+'''
 
 def calculate_uptime_downtime(store_id, business_hours, polls, timezone_str):
     print(f"Calculating uptime and downtime for store {store_id}...")
