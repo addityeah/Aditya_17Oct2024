@@ -1,5 +1,7 @@
 # Uptime Monitoring Backend
 
+The video demo is [available here](https://drive.google.com/file/d/1-fQX2HrPREDdOZ7QqdegGsQIrIHFB_J1/view?usp=sharing)
+
 This project is a backend API built using Flask and SQLAlchemy to monitor the uptime and downtime of various restaurants based on their business hours and polling data. The backend generates reports for restaurant owners to analyze how often their stores went inactive during business hours. The API is designed to handle dynamic data, which is periodically updated.
 
 ## Problem Statement
